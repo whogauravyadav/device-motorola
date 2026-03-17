@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -13,7 +15,7 @@ class DeviceMotorolaApp extends StatelessWidget {
     return MaterialApp(
       title: 'Device Motorola',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFF8383)),
         useMaterial3: true,
       ),
       home: const LoginScreen(),
@@ -30,8 +32,10 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen>
     with SingleTickerProviderStateMixin {
-  static const String _validUsername = 'karishma';
-  static const String _validPassword = 'pd143@grv';
+  static const String _validUsername =
+      String.fromEnvironment('APP_USERNAME', defaultValue: 'karishma');
+  static const String _validPassword =
+      String.fromEnvironment('APP_PASSWORD', defaultValue: 'pd143@grv');
 
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
@@ -76,6 +80,17 @@ class _LoginScreenState extends State<LoginScreen>
       return;
     }
 
+    if (_validUsername.isEmpty || _validPassword.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Login credentials are not configured. Start app with --dart-define values.',
+          ),
+        ),
+      );
+      return;
+    }
+
     final username = _usernameController.text.trim();
     final password = _passwordController.text;
 
@@ -113,70 +128,176 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   Widget build(BuildContext context) {
+    final borderColor = Colors.white.withValues(alpha: 0.2);
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Login'),
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: SlideTransition(
-              position: _slideAnimation,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 420),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      const Text(
-                        'Device Motorola',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.w700,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: <Color>[
+              Color(0xFFFF8383),
+              Color(0xFFFF9A9A),
+              Color(0xFFFFB3B3),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 420),
+                    child: SingleChildScrollView(
+                      child: Container(
+                        padding: const EdgeInsets.fromLTRB(22, 24, 22, 18),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.14),
+                          borderRadius: BorderRadius.circular(28),
+                          border: Border.all(color: borderColor),
+                          boxShadow: <BoxShadow>[
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.12),
+                              blurRadius: 22,
+                              offset: const Offset(0, 12),
+                            ),
+                          ],
+                        ),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: <Widget>[
+                              Container(
+                                width: 66,
+                                height: 66,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.24),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.person_rounded,
+                                  color: Colors.white,
+                                  size: 36,
+                                ),
+                              ),
+                              const SizedBox(height: 18),
+                              const Text(
+                                'Hello Moto',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                'Login to continue',
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.85),
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(height: 22),
+                              TextFormField(
+                                controller: _usernameController,
+                                style: const TextStyle(color: Colors.white),
+                                decoration: InputDecoration(
+                                  hintText: 'Username',
+                                  hintStyle: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.7),
+                                  ),
+                                  prefixIcon: Icon(
+                                    Icons.person_outline_rounded,
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.white.withValues(alpha: 0.08),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                    borderSide: BorderSide(color: borderColor),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                    borderSide: BorderSide(color: borderColor),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                    borderSide: const BorderSide(color: Colors.white),
+                                  ),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.trim().isEmpty) {
+                                    return 'Please enter username';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 14),
+                              TextFormField(
+                                controller: _passwordController,
+                                style: const TextStyle(color: Colors.white),
+                                decoration: InputDecoration(
+                                  hintText: 'Password',
+                                  hintStyle: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.7),
+                                  ),
+                                  prefixIcon: Icon(
+                                    Icons.lock_outline_rounded,
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.white.withValues(alpha: 0.08),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                    borderSide: BorderSide(color: borderColor),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                    borderSide: BorderSide(color: borderColor),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                    borderSide: const BorderSide(color: Colors.white),
+                                  ),
+                                ),
+                                obscureText: true,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter password';
+                                  }
+                                  return null;
+                                },
+                                onFieldSubmitted: (_) => _login(),
+                              ),
+                              const SizedBox(height: 18),
+                              SizedBox(
+                                height: 52,
+                                child: FilledButton(
+                                  style: FilledButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: const Color(0xFFFF8383),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                    textStyle: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  onPressed: _login,
+                                  child: const Text('Login'),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 24),
-                      TextFormField(
-                        controller: _usernameController,
-                        decoration: const InputDecoration(
-                          labelText: 'Username',
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Please enter username';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _passwordController,
-                        decoration: const InputDecoration(
-                          labelText: 'Password',
-                          border: OutlineInputBorder(),
-                        ),
-                        obscureText: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter password';
-                          }
-                          return null;
-                        },
-                        onFieldSubmitted: (_) => _login(),
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: _login,
-                        child: const Text('Login'),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -195,22 +316,55 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   static const MethodChannel _mockChannel =
       MethodChannel('com.example.device_motorola/mock_location');
   static const double _baseLatitude = 25.791440;
   static const double _baseLongitude = 85.838427;
   static const double _radiusMeters = 15;
+  static const List<String> _topGifs = <String>[
+    'lib/krishna.gif',
+    'lib/maha.gif',
+  ];
 
   bool _isOn = false;
   bool _isMockSetupReady = false;
   bool _isLoading = false;
+  bool _hasRedirectedToMockSettings = false;
+  int _currentGifIndex = 0;
+  Timer? _gifSwapTimer;
   String _statusMessage = 'Tap Turn ON to set mock location';
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _startGifRotation();
     _refreshMockStatus();
+  }
+
+  @override
+  void dispose() {
+    _gifSwapTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  void _startGifRotation() {
+    _gifSwapTimer?.cancel();
+    _gifSwapTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+      if (!mounted) return;
+      setState(() {
+        _currentGifIndex = (_currentGifIndex + 1) % _topGifs.length;
+      });
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _refreshMockStatus();
+    }
   }
 
   Future<void> _refreshMockStatus() async {
@@ -219,10 +373,17 @@ class _HomeScreenState extends State<HomeScreen> {
         'getMockStatus',
       );
       if (!mounted) return;
+      final isSetupReady = (response?['isMockSetupReady'] as bool?) ?? false;
+      final isMockActive = (response?['isMockActive'] as bool?) ?? false;
       setState(() {
-        _isMockSetupReady = (response?['isMockSetupReady'] as bool?) ?? false;
-        _isOn = (response?['isMockActive'] as bool?) ?? false;
+        _isMockSetupReady = isSetupReady;
+        _isOn = isMockActive;
       });
+      if (!isSetupReady) {
+        await _redirectToMockLocationSettings();
+      } else {
+        _hasRedirectedToMockSettings = false;
+      }
     } on PlatformException {
       if (!mounted) return;
       setState(() {
@@ -231,8 +392,50 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _redirectToMockLocationSettings({bool force = false}) async {
+    if (!force && _hasRedirectedToMockSettings) {
+      return;
+    }
+
+    _hasRedirectedToMockSettings = true;
+    setState(() {
+      _statusMessage =
+          'Select this app in Developer Options -> Select mock location app.';
+    });
+
+    try {
+      final opened =
+          await _mockChannel.invokeMethod<bool>('openMockLocationSettings') ??
+          false;
+      if (!opened && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Unable to open settings automatically. Open Developer Options manually.',
+            ),
+          ),
+        );
+      }
+    } on PlatformException {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Unable to open settings. Please open Developer Options manually.'),
+        ),
+      );
+    }
+  }
+
   Future<void> _togglePower() async {
     if (_isLoading) {
+      return;
+    }
+
+    await _refreshMockStatus();
+    if (!mounted) return;
+
+    if (!_isMockSetupReady) {
+      await _redirectToMockLocationSettings(force: true);
       return;
     }
 
@@ -276,11 +479,12 @@ class _HomeScreenState extends State<HomeScreen> {
       });
       await _refreshMockStatus();
     } on PlatformException catch (e) {
+      final debugInfo = await _getNativeDebugInfo();
       if (!mounted) return;
       setState(() {
         _isOn = false;
-        _statusMessage = e.message ??
-            'Failed. Enable Developer Options -> Select mock location app -> Device Motorola.';
+        _statusMessage =
+            '${e.message ?? 'Failed to set mock location.'} ${debugInfo.isNotEmpty ? '\n$debugInfo' : ''}';
       });
       await _refreshMockStatus();
       if (!mounted) return;
@@ -296,6 +500,23 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<String> _getNativeDebugInfo() async {
+    try {
+      final info = await _mockChannel.invokeMapMethod<String, dynamic>(
+        'getMockDebugInfo',
+      );
+      final lastEvent = (info?['lastEvent'] as String?) ?? '';
+      final pref = (info?['isMockActivePref'] as bool?) ?? false;
+      final mem = (info?['isMockActiveMem'] as bool?) ?? false;
+      if (lastEvent.isEmpty) {
+        return '';
+      }
+      return 'Debug: pref=$pref mem=$mem event=$lastEvent';
+    } on PlatformException {
+      return '';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -304,6 +525,20 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 350),
+                child: Image.asset(
+                  _topGifs[_currentGifIndex],
+                  key: ValueKey<int>(_currentGifIndex),
+                  width: 300,
+                  height: 180,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+            const SizedBox(height: 30),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -380,7 +615,7 @@ class _StatusDot extends StatelessWidget {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(0.5),
+                color: color.withValues(alpha: 0.5),
                 blurRadius: 10,
                 spreadRadius: 1,
               ),

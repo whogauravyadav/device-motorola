@@ -46,6 +46,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.7
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -57,6 +59,9 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  assets:
+    - lib/krishna.gif
+    - lib/maha.gif
 
   # To add assets to your application, add an assets section, like this:
   # assets:
@@ -88,3 +93,24 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "lib/_icon_Motorola-Phone.png"
+  adaptive_icon_foreground: "lib/_icon_Motorola-Phone.png"
+  adaptive_icon_background: "#FF8383"
+  adaptive_icon_foreground_inset: 28
+  remove_alpha_ios: true
+
+flutter_native_splash:
+  color: "#FF8383"
+  image: "lib/_icon_Motorola-Phone.png"
+  android_gravity: center
+  ios_content_mode: scaleAspectFit
+  android: true
+  ios: true
+  web: false
+  android_12:
+    color: "#FF8383"
+    image: "lib/_icon_Motorola-Phone.png"
